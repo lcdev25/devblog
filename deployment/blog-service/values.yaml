@@ -1,0 +1,33 @@
+replicaCount: 2
+
+image:
+  repository: blog-service
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8025
+
+ingress:
+  enabled: false
+  annotation: {}
+  hosts:
+    - host: blog.lcdev25.com
+      paths: ["/"]
+  tls: []
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
