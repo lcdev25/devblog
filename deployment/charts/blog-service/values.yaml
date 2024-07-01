@@ -10,14 +10,6 @@ service:
   port: 80
   targetPort: 8025
 
-ingress:
-  enabled: false
-  annotation: {}
-  hosts:
-    - host: blog.lcdev25.com
-      paths: ["/"]
-  tls: []
-
 resources:
   limits:
     cpu: 500m
