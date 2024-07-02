@@ -1,3 +1,5 @@
+namespace: devblog-ns
+
 replicaCount: 2
 
 image:

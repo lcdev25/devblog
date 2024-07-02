@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "nginx-ingress.fullname" . }}
+  namespace: {{ .Values.namespace }}
   labels:
     app: {{ include "nginx-ingress.name" . }}
     release: {{ .Release.Name }}
@@ -13,6 +14,7 @@ spec:
       release: {{ .Release.Name }}
   template:
     metadata:
+      namespace: {{ .Values.namespace }}
       labels:
         app: {{ include "nginx-ingress.name" . }}
         release: {{ .Release.Name }}

@@ -1,18 +1,23 @@
 DOCKER_REGISTRY := your-docker-registry
-HELM_RELEASE_NAME := devblog-rel-1
+HELM_APP_RELEASE_NAME := devblog-rel-1
+HELM_INFRA_RELEASE_NAME := devblog-rel-1-infra
 HELM_CHART_NAME := Chart.yaml
 KIND_CLUSTER_NAME := test
 MICROSERVICES := blog-service
 
 MICROSERVICE ?= all
 
-.PHONY: destroy-local
-destroy-local:
-	helm uninstall $(HELM_RELEASE_NAME)
+.PHONY: destroy-app-local
+destroy-app-local:
+	helm uninstall $(HELM_APP_RELEASE_NAME)
 
+.PHONY: deploy-infra-local
+deploy-infra-local:
+	@echo "Updating Helm deployment Infra..."; \
+	helm upgrade --install $(HELM_INFRA_RELEASE_NAME) ./deployment/infra
 
-.PHONY: deploy-local
-deploy-local:
+.PHONY: deploy-app-local
+deploy-app-local:
 ifeq ($(MICROSERVICE), all)
 	for ms in $(MICROSERVICES); do \
 		$(MAKE) deploy-microservice MICROSERVICE=$$ms; \
@@ -46,9 +51,9 @@ load-kind-image:
 .PHONY: update-helm
 update-helm:
 	@echo "Updating Helm deployment for $(MICROSERVICE) with image tag $(UUID)..."; \
-	helm upgrade --install --set $(MICROSERVICE).image.tag=$(UUID) $(HELM_RELEASE_NAME) ./deployment
+	helm upgrade --install --set $(MICROSERVICE).image.tag=$(UUID) $(HELM_APP_RELEASE_NAME) ./deployment/app
 
 .PHONY: port-forward
 port-forward:
 	@echo "Starting port forward..."; \
-	kubectl port-forward svc/default-$(HELM_RELEASE_NAME)-nginx-ingress 8080:80
+	kubectl port-forward svc/default-$(HELM_APP_RELEASE_NAME)-nginx-ingress 8080:80

@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "blog-service.fullname" .}}
+  namespace: {{ .Values.namespace }}
   labels:
     app: {{ include "blog-service.name" .}}
     chart: {{ include "blog-service.chart" .}}
@@ -15,6 +16,7 @@ spec:
       release: {{ .Release.Name }}
   template:
     metadata:
+      namespace: {{ .Values.namespace }}
       labels:
         app: {{ include "blog-service.name" . }}
         release: {{ .Release.Name }}

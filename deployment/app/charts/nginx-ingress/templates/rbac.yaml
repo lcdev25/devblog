@@ -2,6 +2,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: nginx-ingress-clusterrole
+  namespace: {{ .Values.namespace }}
 rules:
   - apiGroups: [""]
     resources: ["pods", "services", "endpoints", "configmaps", "secrets"]
@@ -19,6 +20,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: nginx-ingress-rolebinding
+  namespace: {{ .Values.namespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -33,7 +35,7 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: default
+  namespace: {{ .Values.namespace }}
   name: nginx-ingress-role
 rules:
   - apiGroups: [""]
@@ -51,7 +53,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: nginx-ingress-rolebinding
-  namespace: default
+  namespace: {{ .Values.namespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role

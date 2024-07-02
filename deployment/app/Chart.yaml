@@ -1,5 +1,5 @@
 apiVersion: v2
-name: devblog-chart
+name: devblog-app-chart
 description: A Helm chart for packaging the entire devblog application
 version: 1.0.0
 appVersion: "0.0.1-SNAPSHOT"

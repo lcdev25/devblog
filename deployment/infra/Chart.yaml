@@ -1,0 +1,10 @@
+apiVersion: v2
+name: devblog-infra-chart
+description: A Helm chart for packaging the entire devblog infrastructure
+version: 1.0.0
+appVersion: "0.0.1-SNAPSHOT"
+
+dependencies:
+  - name: namespaces
+    version: 1.0.0
+    repository: file://charts/namespaces

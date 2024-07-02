@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "blog-service.fullname" . }}
+  namespace: {{ .Values.namespace }}
   labels:
     app: {{ include "blog-service.name" . }}
     chart: {{ include "blog-service.chart" . }}
