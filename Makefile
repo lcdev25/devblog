@@ -2,19 +2,13 @@ DOCKER_REGISTRY := your-docker-registry
 HELM_APP_RELEASE_NAME := devblog-rel-1
 HELM_INFRA_RELEASE_NAME := devblog-rel-1-infra
 HELM_CHART_NAME := Chart.yaml
-KIND_CLUSTER_NAME := test
-MICROSERVICES := blog-service
+MICROSERVICES := blog-service user-service
 
 MICROSERVICE ?= all
 
 .PHONY: destroy-app-local
 destroy-app-local:
 	helm uninstall $(HELM_APP_RELEASE_NAME)
-
-.PHONY: deploy-infra-local
-deploy-infra-local:
-	@echo "Updating Helm deployment Infra..."; \
-	helm upgrade --install $(HELM_INFRA_RELEASE_NAME) ./deployment/infra
 
 .PHONY: deploy-app-local
 deploy-app-local:
@@ -27,7 +21,7 @@ else
 endif
 
 .PHONY: deploy-microservice
-deploy-microservice: package-backend build-docker-image port-forward
+deploy-microservice: package-backend build-docker-image
 
 .PHONY: package-backend
 package-backend:
@@ -40,13 +34,13 @@ build-docker-image:
 	UUID=$$(uuidgen); \
 	echo "Building Docker image for $(MICROSERVICE) with tag $(UUID)"; \
 	docker build -t $(MICROSERVICE):$$UUID -t $(MICROSERVICE):latest ./backend/$(MICROSERVICE); \
-	$(MAKE) load-kind-image UUID=$$UUID MICROSERVICE=$(MICROSERVICE); \
+	$(MAKE) load-image UUID=$$UUID MICROSERVICE=$(MICROSERVICE); \
 	$(MAKE) update-helm UUID=$$UUID MICROSERVICE=$(MICROSERVICE)
 
-.PHONY: load-kind-image
-load-kind-image:
-	@echo "Loading Docker image into KinD cluster for $(MICROSERVICE) with tag $(UUID)..."; \
-	kind load docker-image $(MICROSERVICE):$(UUID) --name $(KIND_CLUSTER_NAME)
+.PHONY: load-image
+load-image:
+	@echo "Loading Docker image into minikube cluster for $(MICROSERVICE) with tag $(UUID)..."; \
+	minikube image load $(MICROSERVICE):$(UUID)
 
 .PHONY: update-helm
 update-helm:

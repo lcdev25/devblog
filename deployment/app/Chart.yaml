@@ -1,13 +1,16 @@
 apiVersion: v2
 name: devblog-app-chart
 description: A Helm chart for packaging the entire devblog application
-version: 1.0.0
+version: 0.1.0
 appVersion: "0.0.1-SNAPSHOT"
 
 dependencies:
+  - name: ingress-service
+    version: 0.1.0
+    repository: file://charts/ingress-service
   - name: blog-service
-    version: 1.0.0
+    version: 0.1.0
     repository: file://charts/blog-service
-  - name: nginx-ingress
-    version: 1.0.0
-    repository: file://charts/nginx-ingress
+  - name: user-service
+    version: 0.1.0
+    repository: file://charts/user-service
