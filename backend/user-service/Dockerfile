@@ -1,10 +1,8 @@
 #FROM docker.repo.local.sfdc.net/sfci/onejdk/salesforcejdk/sfdc_rhel9_onejdk21:11
 FROM eclipse-temurin:21
 
-RUN apk --no-cache add shadow
-
 RUN groupadd --system --gid 7447 nonroot
-RUN adduser --system --gid 7447 --uid 7447 --shell /bin/bash --home /home/nonroot nonroot
+RUN useradd --system --gid 7447 --uid 7447 --shell /bin/bash --home /home/nonroot nonroot
 
 WORKDIR /home/nonroot
 RUN chown -R nonroot:nonroot .
