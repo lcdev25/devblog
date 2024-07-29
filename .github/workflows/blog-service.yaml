@@ -16,7 +16,6 @@ env:
   REGISTRY: ghcr.io/lcdev25  # Replace with your GitHub username
   MODULE_NAME: blog-service  # Replace with the module name
   IMAGE_NAME: devblog-blog-service
-  GHCR_URL: "https://api.github.com/users/${{ github.repository_owner }}/packages/container/${{ env.IMAGE_NAME }}/versions"
 
 jobs:
   build-and-deploy:
@@ -41,6 +40,9 @@ jobs:
         run: |
           CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f backend/${{ env.MODULE_NAME }}/pom.xml)
           echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+
+      - name: Set GHCR_URL
+        run: echo "GHCR_URL=https://api.github.com/users/${GITHUB_REPOSITORY_OWNER}/packages/container/${IMAGE_NAME}/versions" >> $GITHUB_ENV
 
       - name: Navigate to backend directory
         run: cd backend
@@ -88,6 +90,9 @@ jobs:
 
       - name: Set up jq
         run: sudo apt-get install jq -y
+
+      - name: Set GHCR_URL
+        run: echo "GHCR_URL=https://api.github.com/users/${GITHUB_REPOSITORY_OWNER}/packages/container/${IMAGE_NAME}/versions" >> $GITHUB_ENV
 
       - name: List images in GitHub Container Registry
         id: list_images
