@@ -1,3 +1,4 @@
+{{- if .Values.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -8,18 +9,21 @@ metadata:
     chart: {{ include "blog-service.chart" .}}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+    codeVersion: {{ .Values.codeVersion }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: {{ include "blog-service.name" . }}
       release: {{ .Release.Name }}
+      codeVersion: {{ .Values.codeVersion }}
   template:
     metadata:
       namespace: {{ .Values.namespace }}
       labels:
         app: {{ include "blog-service.name" . }}
         release: {{ .Release.Name }}
+        codeVersion: {{ .Values.codeVersion }}
     spec:
       containers:
         - name: {{ .Chart.Name }}

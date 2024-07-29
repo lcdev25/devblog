@@ -1,5 +1,9 @@
 namespace: devblog-ns
 
+codeVersion: 0.1.0
+
+enabled: false
+
 ingress:
   enabled: true
   annotations:

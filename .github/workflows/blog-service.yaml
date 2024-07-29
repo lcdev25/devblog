@@ -1,0 +1,111 @@
+name: Build, Test, and Deploy Blog Service
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'backend/blog-service/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/blog-service/**'
+
+env:
+  REGISTRY: ghcr.io/lcdev25  # Replace with your GitHub username
+  MODULE_NAME: blog-service  # Replace with the module name
+  IMAGE_NAME: devblog-blog-service
+  GHCR_URL: "https://api.github.com/users/${{ github.repository_owner }}/packages/container/${{ env.IMAGE_NAME }}/versions"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '21'
+          distribution: 'adopt'
+
+      - name: Generate UUID for Docker tag
+        id: generate-uuid
+        run: echo "UUID=$(uuidgen)" >> $GITHUB_ENV
+
+      - name: Extract current version from POM
+        id: extract_version
+        run: |
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f backend/${{ env.MODULE_NAME }}/pom.xml)
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+
+      - name: Navigate to backend directory
+        run: cd backend
+
+      - name: Build with Maven
+        run: mvn -pl ${{ env.MODULE_NAME }} clean install
+
+      - name: Run Tests
+        run: mvn -pl ${{ env.MODULE_NAME }} test
+
+      - name: Build Docker image
+        run: docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.UUID }} -f backend/${{ env.MODULE_NAME }}/Dockerfile .
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+
+      - name: Push Docker image
+        run: docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.UUID }}
+
+      - name: Set up Kubeconfig
+        if: github.event_name == 'push'
+        run: echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 -d > ~/.kube/config
+
+      - name: Install Helm
+        if: github.event_name == 'push'
+        run: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Deploy to Kubernetes using Helm
+        if: github.event_name == 'push'
+        run: |
+          helm dependency update ./deployment/app
+          helm upgrade --install devblog-app ./deployment/app -f ./deployment/app/values.yaml \
+          --set ${{ env.MODULE_NAME }}.codeVersion=${{ env.CURRENT_VERSION }} \
+          --set ${{ env.MODULE_NAME }}.enabled=true \
+          --set ${{ env.MODULE_NAME }}.image.repository=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} \
+          --set ${{ env.MODULE_NAME }}.image.tag=${{ env.UUID }}
+
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: build-and-deploy
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up jq
+        run: sudo apt-get install jq -y
+
+      - name: List images in GitHub Container Registry
+        id: list_images
+        env:
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+        run: |
+          IMAGE_LIST=$(curl -H "Authorization: Bearer $GHCR_TOKEN" "${{ env.GHCR_URL }}" | jq -r '.[].id')
+          echo "::set-output name=images::$IMAGE_LIST"
+
+      - name: Delete old images
+        env:
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+        run: |
+          IMAGES_TO_KEEP=2
+          IMAGE_IDS=(${IMAGE_LIST// / })
+          if [ ${#IMAGE_IDS[@]} -gt $IMAGES_TO_KEEP ]; then
+            IMAGES_TO_DELETE=(${IMAGE_IDS[@]:$IMAGES_TO_KEEP})
+            for IMAGE_ID in "${IMAGES_TO_DELETE[@]}"; do
+              curl -X DELETE -H "Authorization: Bearer $GHCR_TOKEN" "${{ env.GHCR_URL }}/${IMAGE_ID}"
+            done
+          fi

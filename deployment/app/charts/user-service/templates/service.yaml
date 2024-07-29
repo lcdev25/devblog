@@ -8,10 +8,12 @@ metadata:
     chart: {{ include "user-service.chart" . }}
     release: {{ .Release.Name}}
     heritage: {{ .Release.Service }}
+    codeVersion: {{ .Values.codeVersion }}
 spec:
   selector:
     app: {{ include "user-service.name" . }}
     release: {{ .Release.Name }}
+    codeVersion: {{ .Values.codeVersion }}
   ports:
     - port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.targetPort }}

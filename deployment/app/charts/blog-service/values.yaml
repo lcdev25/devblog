@@ -1,6 +1,10 @@
 namespace: devblog-ns
 
-replicaCount: 2
+replicaCount: 1
+
+enabled: false
+
+codeVersion: 0.1.0
 
 image:
   repository: blog-service

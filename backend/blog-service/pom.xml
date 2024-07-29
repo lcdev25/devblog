@@ -5,10 +5,11 @@
     <parent>
         <groupId>com.lcdev25</groupId>
         <artifactId>devblog</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>1.0.0</version>
         <!-- lookup parent from repository -->
     </parent>
     <artifactId>blog-service</artifactId>
+    <version>1.0.0</version>
     <properties>
         <java.version>21</java.version>
         <start-class>com.lcdev25.devblog.blog.DevblogApplication</start-class>
