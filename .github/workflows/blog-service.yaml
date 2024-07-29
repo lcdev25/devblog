@@ -91,23 +91,30 @@ jobs:
       - name: Set GHCR_URL
         run: echo "GHCR_URL=https://api.github.com/users/${GITHUB_REPOSITORY_OWNER}/packages/container/${IMAGE_NAME}/versions" >> $GITHUB_ENV
 
-      - name: List images in GitHub Container Registry
+      - name: List images in GitHub Container Registry and delete all except last 2
         id: list_images
         env:
           GHCR_TOKEN: ${{ secrets.GHCR_PAT }}
         run: |
-          IMAGE_LIST=$(curl -H "Authorization: Bearer $GHCR_TOKEN" "${{ env.GHCR_URL }}" | jq -r '.[].id')
-          echo "images=$IMAGE_LIST" >> $GITHUB_ENV
-
-      - name: Delete old images
-        env:
-          GHCR_TOKEN: ${{ secrets.GHCR_PAT }}
-        run: |
+          # List images
+          IMAGE_LIST=$(curl -H "Authorization: Bearer $GHCR_TOKEN" "$GHCR_URL" | jq -r '.[].id')
+          
+          # Split the image list into an array
+          IMAGE_IDS=()
+          while IFS= read -r line; do
+            IMAGE_IDS+=("$line")
+          done <<< "$IMAGE_LIST"
+          
+          # Number of images to keep
           IMAGES_TO_KEEP=2
-          IMAGE_IDS=(${IMAGE_LIST// / })
+          
+          # Check if the number of images exceeds the number to keep
           if [ ${#IMAGE_IDS[@]} -gt $IMAGES_TO_KEEP ]; then
-            IMAGES_TO_DELETE=(${IMAGE_IDS[@]:$IMAGES_TO_KEEP})
+            # Images to delete
+            IMAGES_TO_DELETE=("${IMAGE_IDS[@]:$IMAGES_TO_KEEP}")
+          
+            # Delete old images
             for IMAGE_ID in "${IMAGES_TO_DELETE[@]}"; do
-              curl -X DELETE -H "Authorization: Bearer $GHCR_TOKEN" "${{ env.GHCR_URL }}/${IMAGE_ID}"
+              curl -X DELETE -H "Authorization: Bearer $GHCR_TOKEN" "$GHCR_URL/$IMAGE_ID"
             done
           fi
