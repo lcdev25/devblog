@@ -51,7 +51,7 @@ jobs:
         run: cd backend && mvn -pl ${{ env.MODULE_NAME }} test
 
       - name: Build Docker image
-        run: docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.UUID }} -f backend/${{ env.MODULE_NAME }}/Dockerfile .
+        run: cd backend/${{ env.MODULE_NAME }} && docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.UUID }} -f ./Dockerfile .
 
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
