@@ -97,7 +97,7 @@ jobs:
           GHCR_TOKEN: ${{ secrets.GHCR_PAT }}
         run: |
           IMAGE_LIST=$(curl -H "Authorization: Bearer $GHCR_TOKEN" "${{ env.GHCR_URL }}" | jq -r '.[].id')
-          echo "::set-output name=images::$IMAGE_LIST"
+          echo "images=$IMAGE_LIST" >> $GITHUB_ENV
 
       - name: Delete old images
         env:
