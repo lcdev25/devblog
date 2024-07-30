@@ -68,9 +68,12 @@ jobs:
         if: github.event_name == 'push'
         run: |
           cd backend/${{ env.MODULE_NAME }}
-          docker buildx create --use --name mybuilder --driver docker-container --bootstrap
-          docker buildx use mybuilder
+          docker buildx create --use --name mybuilder --driver docker-container --bootstrap          
           docker buildx build --platform linux/arm64 -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.UUID }} --push .
+
+      - name: Remove buildx builder instance
+        if: github.event_name == 'push'
+        run: docker buildx rm mybuilder
 
       - name: Print Kubernetes Deployment Commands
         if: github.event_name == 'push'
