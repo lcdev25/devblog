@@ -64,16 +64,8 @@ jobs:
         if: github.event_name == 'push'
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
 
-#      - name: Build and push Docker image for ARM64
-#        if: github.event_name == 'push'
-#        run: |
-#          cd backend/${{ env.MODULE_NAME }}
-#          docker buildx create --use --name mybuilder --driver docker-container --bootstrap
-#          docker buildx build --platform linux/arm64 -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.UUID }} --push .
-#
-#      - name: Remove buildx builder instance
-#        if: github.event_name == 'push'
-#        run: docker buildx rm mybuilder
+      - name: Debug - List Docker Images Before Build
+        run: docker images
 
       - name: Build and push multi-architecture image
         if: github.event_name == 'push'
@@ -84,6 +76,11 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.UUID }}
           platforms: linux/arm64
+        env:
+          BUILDKIT_INLINE_CACHE: 1
+
+      - name: Debug - List Docker Images After Build
+        run: docker images
 
       - name: Print Kubernetes Deployment Commands
         if: github.event_name == 'push'
