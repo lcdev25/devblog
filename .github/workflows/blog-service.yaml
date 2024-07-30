@@ -68,7 +68,8 @@ jobs:
         if: github.event_name == 'push'
         run: |
           cd backend/${{ env.MODULE_NAME }}
-          docker buildx create --use
+          docker buildx create --use --name mybuilder --driver docker-container --bootstrap
+          docker buildx use mybuilder
           docker buildx build --platform linux/arm64 -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.UUID }} --push .
 
       - name: Print Kubernetes Deployment Commands

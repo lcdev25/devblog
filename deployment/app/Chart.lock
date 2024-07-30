@@ -1,0 +1,12 @@
+dependencies:
+- name: blog-service
+  repository: file://charts/blog-service
+  version: 0.1.0
+- name: ingress-service
+  repository: file://charts/ingress-service
+  version: 0.1.0
+- name: user-service
+  repository: file://charts/user-service
+  version: 0.1.0
+digest: sha256:1ebf23415c8fa4f4229ad6dc501d95db023da77fad152088ff620ef3d955c267
+generated: "2024-07-30T18:34:51.14869+05:30"
