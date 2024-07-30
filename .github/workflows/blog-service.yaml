@@ -76,6 +76,7 @@ jobs:
 #        run: docker buildx rm mybuilder
 
       - name: Build and push multi-architecture image
+        if: github.event_name == 'push'
         uses: docker/build-push-action@v6
         with:
           context: backend/${{ env.MODULE_NAME }}
