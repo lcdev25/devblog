@@ -10,7 +10,7 @@ public class TestController {
 
     @GetMapping("")
     public String test() {
-        return "Tested and working, let's see again and again";
+        return "Tested and working, let's see again";
     }
 
 }
