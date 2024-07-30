@@ -71,30 +71,40 @@ jobs:
           docker buildx create --use
           docker buildx build --platform linux/arm64 -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.UUID }} --push .
 
-      - name: Set up Kubeconfig
+      - name: Print Kubernetes Deployment Commands
         if: github.event_name == 'push'
-        run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 -d > ~/.kube/config
-          chmod 600 ~/.kube/config  # Change permissions to be readable only by the owner
+        run: |          
+          echo "helm dependency update ./deployment/app"
+          echo "helm upgrade --install devblog-app ./deployment/app -f ./deployment/app/values.yaml \\"
+          echo "  --set ${{ env.MODULE_NAME }}.codeVersion=${{ env.CURRENT_VERSION }} \\"
+          echo "  --set ${{ env.MODULE_NAME }}.enabled=true \\"
+          echo "  --set ${{ env.MODULE_NAME }}.image.repository=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} \\"
+          echo "  --set ${{ env.MODULE_NAME }}.image.tag=${{ env.UUID }}"        
 
-      - name: Test kubectl
-        if: github.event_name == 'push'
-        run: echo "$(kubectl get nodes)"
-
-      - name: Install Helm
-        if: github.event_name == 'push'
-        run: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-
-      - name: Deploy to Kubernetes using Helm
-        if: github.event_name == 'push'
-        run: |
-          helm dependency update ./deployment/app
-          helm upgrade --install devblog-app ./deployment/app -f ./deployment/app/values.yaml \
-          --set ${{ env.MODULE_NAME }}.codeVersion=${{ env.CURRENT_VERSION }} \
-          --set ${{ env.MODULE_NAME }}.enabled=true \
-          --set ${{ env.MODULE_NAME }}.image.repository=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} \
-          --set ${{ env.MODULE_NAME }}.image.tag=${{ env.UUID }}
+#      - name: Set up Kubeconfig
+#        if: github.event_name == 'push'
+#        run: |
+#          mkdir -p ~/.kube
+#          echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 -d > ~/.kube/config
+#          chmod 600 ~/.kube/config  # Change permissions to be readable only by the owner
+#
+#      - name: Test kubectl
+#        if: github.event_name == 'push'
+#        run: echo "$(kubectl get nodes)"
+#
+#      - name: Install Helm
+#        if: github.event_name == 'push'
+#        run: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+#
+#      - name: Deploy to Kubernetes using Helm
+#        if: github.event_name == 'push'
+#        run: |
+#          helm dependency update ./deployment/app
+#          helm upgrade --install devblog-app ./deployment/app -f ./deployment/app/values.yaml \
+#          --set ${{ env.MODULE_NAME }}.codeVersion=${{ env.CURRENT_VERSION }} \
+#          --set ${{ env.MODULE_NAME }}.enabled=true \
+#          --set ${{ env.MODULE_NAME }}.image.repository=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }} \
+#          --set ${{ env.MODULE_NAME }}.image.tag=${{ env.UUID }}
 
   cleanup:
     runs-on: ubuntu-latest
