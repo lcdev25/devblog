@@ -7,7 +7,6 @@ replicaCount: 1
 codeVersion: 0.1.0
 
 image:
-  repository: user-service
   tag: latest
   pullPolicy: IfNotPresent
 

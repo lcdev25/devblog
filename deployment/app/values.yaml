@@ -3,19 +3,16 @@ ingress-service:
   enabled: false
   codeVersion: 0.1.0
   image:
-    repository: ghcr.io/lcdev25/ingress-service
-    tag: latest
+    tag: ghcr.io/lcdev25/ingress-service:latest
 
 blog-service:
   enabled: false
   codeVersion: 0.1.0
   image:
-    repository: ghcr.io/lcdev25/blog-service
-    tag: latest
+    tag: ghcr.io/lcdev25/blog-service:latest
 
 user-service:
   enabled: false
   codeVersion: 0.1.0
   image:
-    repository: ghcr.io/lcdev25/user-service
-    tag: latest
+    tag: ghcr.io/lcdev25/user-service:latest
