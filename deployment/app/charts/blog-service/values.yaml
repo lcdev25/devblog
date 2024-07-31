@@ -7,7 +7,6 @@ enabled: false
 codeVersion: 0.1.0
 
 image:
-  repository: blog-service
   tag: latest
   pullPolicy: IfNotPresent
 
