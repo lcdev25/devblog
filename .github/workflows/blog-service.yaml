@@ -32,10 +32,6 @@ jobs:
           java-version: '21'
           distribution: 'adopt'
 
-      - name: Generate UUID for Docker tag
-        id: generate-uuid
-        run: echo "UUID=$(uuidgen)" >> $GITHUB_ENV
-
       - name: Extract current version from POM
         id: extract_version
         run: |
@@ -109,7 +105,7 @@ jobs:
   #          helm upgrade --install devblog-app ./deployment/app -f ./deployment/app/values.yaml \
   #          --set ${{ env.MODULE_NAME }}.codeVersion=${{ env.CURRENT_VERSION }} \
   #          --set ${{ env.MODULE_NAME }}.enabled=true \
-  #          --set ${{ env.MODULE_NAME }}.image.tag=${{ env.UUID }}
+  #          --set ${{ env.MODULE_NAME }}.image.tag=${{ env.TAG }}
 
   cleanup:
     runs-on: ubuntu-latest
