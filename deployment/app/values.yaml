@@ -1,10 +1,4 @@
 # values.yaml
-ingress-service:
-  enabled: false
-  codeVersion: 0.1.0
-  image:
-    tag: ghcr.io/lcdev25/ingress-service:latest
-
 blog-service:
   enabled: false
   codeVersion: 0.1.0
