@@ -1,11 +1,9 @@
 # values.yaml
 blog-service:
-  enabled: false
-  codeVersion: 0.1.0
+  codeVersion: 1.0.0
   image:
-    tag: docker.io/lcdev25/devblog-blog-service:latest
+    tag: docker.io/lcdev25/devblog-blog-service:f3f086a12d3be828293aa4dc7467be7f1bb6183c
 
 ui-service:
-  enabled: false
   image:
-    tag: docker.io/lcdev25/devblog-ui-service:latest
+    tag: docker.io/lcdev25/devblog-ui-service:f9d2913989681b3c14a33bd95b4b484f8c08b218

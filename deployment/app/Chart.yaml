@@ -8,6 +8,6 @@ dependencies:
   - name: blog-service
     version: 0.1.0
     repository: file://charts/blog-service
-  - name: user-service
+  - name: ui-service
     version: 0.1.0
-    repository: file://charts/user-service
+    repository: file://charts/ui-service

@@ -41,6 +41,7 @@ jobs:
       - name: Set up environment variables
         run: |
           echo "TAG=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.UUID }}" >> $GITHUB_ENV
+          echo "LATEST_TAG=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_ENV
 
       - name: Build multi-architecture image
         if: github.event_name == 'pull_request'
@@ -57,15 +58,16 @@ jobs:
         with:
           context: frontend
           push: true
-          tags: ${{ env.TAG }}
+          tags: |
+            ${{ env.TAG }}
+            ${{ env.LATEST_TAG }}
           platforms: linux/arm64
 
       - name: Print Kubernetes Deployment Commands
         if: github.event_name == 'push'
         run: |
           echo "helm dependency update ./deployment/app"
-          echo "helm upgrade --install devblog-app ./deployment/app -f ./deployment/app/values.yaml \\"
-          echo "  --set ${{ env.MODULE_NAME }}.enabled=true \\"
+          echo "helm upgrade --install devblog-app ./deployment/app -f ./deployment/app/values.yaml \\"          
           echo "  --set ${{ env.MODULE_NAME }}.image.tag=${{ env.TAG }}"        
 
   cleanup:

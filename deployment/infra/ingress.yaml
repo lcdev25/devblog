@@ -1,10 +1,34 @@
 apiVersion: networking.k8s.io/v1  # Specify the API version
 kind: Ingress  # Define an Ingress resource
 metadata:
-  name: my-app-ingress  # Name of the Ingress resource
+  name: my-app-ingress-services  # Name of the Ingress resource
   namespace: devblog-ns  # Namespace where the Ingress will be created
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$3  # Annotation to rewrite target URI
+    nginx.ingress.kubernetes.io/rewrite-target: /$2  # Annotation to rewrite target URI
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"  # Annotation to enable SSL redirect
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"  # Annotation to force SSL redirect
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+    - host: oomlog.in  # Replace with your domain
+      http:
+        paths:
+          - path: /api/blog(/|$)(.*)
+            pathType: ImplementationSpecific  # Specify the type of path matching
+            backend:
+              service:
+                name: devblog-blog-service  # Replace with your service name
+                port:
+                  number: 80  # Port on which the service is listening
+
+---
+
+apiVersion: networking.k8s.io/v1  # Specify the API version
+kind: Ingress  # Define an Ingress resource
+metadata:
+  name: my-app-ingress-ui  # Name of the Ingress resource
+  namespace: devblog-ns  # Namespace where the Ingress will be created
+  annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"  # Annotation to enable SSL redirect
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"  # Annotation to force SSL redirect
     kubernetes.io/ingress.class: "nginx"
@@ -14,16 +38,9 @@ spec:
       http:
         paths:
           - path: /
-            pathType: Prefix
+            pathType: Prefix  # Changed to Prefix to handle all non-/api routes
             backend:
               service:
-                name: devblog-ui-service
+                name: devblog-ui-service  # Replace with your UI service name
                 port:
                   number: 80
-          - path: /api/blog(/|$)(.*)
-            pathType: ImplementationSpecific  # Specify the type of path matching
-            backend:
-              service:
-                name: devblog-blog-service  # Replace with your service name
-                port:
-                  number: 80  # Port on which the service is listening

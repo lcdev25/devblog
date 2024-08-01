@@ -2,8 +2,6 @@ namespace: devblog-ns
 
 replicaCount: 1
 
-enabled: false
-
 codeVersion: 0.1.0
 
 image:
