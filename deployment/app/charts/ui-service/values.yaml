@@ -2,8 +2,6 @@ namespace: devblog-ns
 
 replicaCount: 1
 
-enabled: false
-
 image:
   tag: latest
   pullPolicy: IfNotPresent

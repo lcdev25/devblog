@@ -2,8 +2,8 @@ dependencies:
 - name: blog-service
   repository: file://charts/blog-service
   version: 0.1.0
-- name: user-service
-  repository: file://charts/user-service
+- name: ui-service
+  repository: file://charts/ui-service
   version: 0.1.0
-digest: sha256:df36411515cef38e872831959e72b2acc96d9d86ae94facb87b287aa57269032
-generated: "2024-07-31T15:52:49.01711+05:30"
+digest: sha256:f1b28ec85540d94f032336756aab5f1c45f22034c0307cc13d2f2992de52a688
+generated: "2024-08-01T16:27:07.109253+05:30"
