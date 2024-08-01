@@ -1,0 +1,29 @@
+namespace: devblog-ns
+
+replicaCount: 1
+
+codeVersion: 0.1.0
+
+image:
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  name: devblog-user-service
+  type: ClusterIP
+  port: 80
+  targetPort: 8025
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
