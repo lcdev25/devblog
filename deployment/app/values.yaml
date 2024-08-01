@@ -3,10 +3,9 @@ blog-service:
   enabled: false
   codeVersion: 0.1.0
   image:
-    tag: ghcr.io/lcdev25/blog-service:latest
+    tag: docker.io/lcdev25/devblog-blog-service:latest
 
-user-service:
+ui-service:
   enabled: false
-  codeVersion: 0.1.0
   image:
-    tag: ghcr.io/lcdev25/user-service:latest
+    tag: docker.io/lcdev25/devblog-ui-service:latest

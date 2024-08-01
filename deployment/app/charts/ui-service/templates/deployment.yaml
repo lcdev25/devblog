@@ -2,28 +2,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "user-service.fullname" .}}
+  name: {{ .Values.service.name }}
   namespace: {{ .Values.namespace }}
   labels:
-    app: {{ include "user-service.name" .}}
-    chart: {{ include "user-service.chart" .}}
+    app: {{ .Values.service.name }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    codeVersion: {{ .Values.codeVersion }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ include "user-service.name" . }}
+      app: {{ .Values.service.name }}
       release: {{ .Release.Name }}
-      codeVersion: {{ .Values.codeVersion }}
   template:
     metadata:
       namespace: {{ .Values.namespace }}
       labels:
-        app: {{ include "user-service.name" . }}
+        app: {{ .Values.service.name }}
         release: {{ .Release.Name }}
-        codeVersion: {{ .Values.codeVersion }}
     spec:
       containers:
         - name: {{ .Chart.Name }}
@@ -38,9 +34,6 @@ spec:
             limits:
               memory: {{ .Values.resources.limits.memory }}
               cpu: {{ .Values.resources.limits.cpu }}
-          env:
-            - name: JAVA_OPTS
-              value: "-Xms256m -Xmx512m"
       imagePullSecrets:
         - name: my-dockerhub-secret
       nodeSelector: {{ toYaml .Values.nodeSelector | indent 0 }}

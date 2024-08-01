@@ -1,10 +1,41 @@
+Step 1: Install Certbot on Your Local Machine
+Install Certbot, the tool used to obtain certificates from Let's Encrypt. On a Unix-based system, you can install it using the following command:
+
+sh
+Copy code
+sudo apt-get update
+sudo apt-get install certbot
+For other operating systems, follow the instructions on the Certbot website.
+
+Step 2: Obtain the Certificate
+Use Certbot to obtain a certificate for your domain:
+
+sh
+Copy code
+sudo certbot certonly --manual --preferred-challenges dns -d your-domain.com
+Replace your-domain.com with your actual domain. Follow the instructions provided by Certbot to create the necessary DNS TXT records to validate your domain ownership.
+
+Step 3: Transfer the Certificate to Your Kubernetes Cluster
+After obtaining the certificate, you need to transfer the certificate files to your Kubernetes cluster. The certificate files are typically located in /etc/letsencrypt/live/your-domain.com/.
+
+You will have the following files:
+
+fullchain.pem: The full certificate chain.
+privkey.pem: The private key.
+
+
+kubectl create namespace devblog-ns
+
+
 kubectl create secret docker-registry my-dockerhub-secret \
 --docker-username=your-dockerhub-username \
 --docker-password=your-dockerhub-pat \
 --docker-email=your-email@example.com \
 --docker-server=https://index.docker.io/v1/
 
-kubectl create secret tls my-app-tls --cert=fullchain.pem --key=privkey.pem -n devblog-ns
+
+
+
 
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update

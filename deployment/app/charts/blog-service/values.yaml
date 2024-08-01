@@ -11,6 +11,7 @@ image:
   pullPolicy: IfNotPresent
 
 service:
+  name: devblog-blog-service
   type: ClusterIP
   port: 80
   targetPort: 8025

@@ -4,23 +4,26 @@ metadata:
   name: my-app-ingress  # Name of the Ingress resource
   namespace: devblog-ns  # Namespace where the Ingress will be created
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2  # Annotation to rewrite target URI
+    nginx.ingress.kubernetes.io/rewrite-target: /$3  # Annotation to rewrite target URI
     nginx.ingress.kubernetes.io/ssl-redirect: "true"  # Annotation to enable SSL redirect
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"  # Annotation to force SSL redirect
     kubernetes.io/ingress.class: "nginx"
 spec:
-  tls:
-    - hosts:
-        - oomlog.in  # Replace with your domain
-      secretName: my-app-tls  # Reference to the secret containing the TLS certificate
   rules:
     - host: oomlog.in  # Replace with your domain
       http:
         paths:
-          - path: /blog(/|$)(.*)
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: devblog-ui-service
+                port:
+                  number: 80
+          - path: /api/blog(/|$)(.*)
             pathType: ImplementationSpecific  # Specify the type of path matching
             backend:
               service:
-                name: devblog-app-blog-service  # Replace with your service name
+                name: devblog-blog-service  # Replace with your service name
                 port:
                   number: 80  # Port on which the service is listening

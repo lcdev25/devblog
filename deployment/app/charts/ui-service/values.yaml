@@ -1,19 +1,18 @@
 namespace: devblog-ns
 
-enabled: false
-
 replicaCount: 1
 
-codeVersion: 0.1.0
+enabled: false
 
 image:
   tag: latest
   pullPolicy: IfNotPresent
 
 service:
+  name: devblog-ui-service
   type: ClusterIP
   port: 80
-  targetPort: 8025
+  targetPort: 3000
 
 resources:
   limits:
