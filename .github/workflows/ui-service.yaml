@@ -1,22 +1,22 @@
-name: Build, Test, and Deploy Blog Service
+name: Build, Test, and Deploy UI Service
 
 on:
   pull_request:
     branches:
       - main
     paths:
-      - 'backend/blog-service/**'
+      - 'frontend/**'
   push:
     branches:
       - main
     paths:
-      - 'backend/blog-service/**'
+      - 'frontend/**'
 
 env:
   DOCKERHUB_USERNAME: lcdev25
   REGISTRY: docker.io/lcdev25  # Replace with your Docker Hub username
-  MODULE_NAME: blog-service  # Replace with the module name
-  IMAGE_NAME: devblog-blog-service
+  MODULE_NAME: ui-service
+  IMAGE_NAME: devblog-ui-service
   UUID: ${{ github.sha }}        # Using the commit SHA as UUID
 
 jobs:
@@ -27,47 +27,35 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          java-version: '21'
-          distribution: 'adopt'
-
-      - name: Extract current version from POM
-        id: extract_version
-        run: |
-          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f backend/${{ env.MODULE_NAME }}/pom.xml)
-          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
-
-      - name: Build with Maven
-        run: cd backend && mvn -pl ${{ env.MODULE_NAME }} clean install
-
-      - name: Run Tests
-        run: cd backend && mvn -pl ${{ env.MODULE_NAME }} test
-
       - name: Set up QEMU
-        if: github.event_name == 'push'
         uses: docker/setup-qemu-action@v3
         with:
           platforms: linux/arm64
 
       - name: Set up Docker Buildx
-        if: github.event_name == 'push'
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to Docker Hub
-        if: github.event_name == 'push'
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ env.DOCKERHUB_USERNAME }} --password-stdin
 
       - name: Set up environment variables
         run: |
           echo "TAG=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.UUID }}" >> $GITHUB_ENV
 
+      - name: Build multi-architecture image
+        if: github.event_name == 'pull_request'
+        uses: docker/build-push-action@v6
+        with:
+          context: frontend
+          push: false
+          tags: ${{ env.TAG }}
+          platforms: linux/arm64
+
       - name: Build and push multi-architecture image
         if: github.event_name == 'push'
         uses: docker/build-push-action@v6
         with:
-          context: backend/${{ env.MODULE_NAME }}
+          context: frontend
           push: true
           tags: ${{ env.TAG }}
           platforms: linux/arm64
@@ -77,7 +65,6 @@ jobs:
         run: |
           echo "helm dependency update ./deployment/app"
           echo "helm upgrade --install devblog-app ./deployment/app -f ./deployment/app/values.yaml \\"
-          echo "  --set ${{ env.MODULE_NAME }}.codeVersion=${{ env.CURRENT_VERSION }} \\"
           echo "  --set ${{ env.MODULE_NAME }}.enabled=true \\"
           echo "  --set ${{ env.MODULE_NAME }}.image.tag=${{ env.TAG }}"        
 
@@ -88,7 +75,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up jq
         run: sudo apt-get install jq -y
